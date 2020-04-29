@@ -435,12 +435,23 @@ class Accounts(Frame):
                 global account_self
                 account_self=self
                 self.lists=[""]*9
+                scrollbar=Scrollbar(self.frame,orient=VERTICAL,command=self.onvsb)
+                
                 for i in range(len(self.columns3)):
-                        Label(self.frame,text=self.columns3[i],font=font1).place(relx=.005+0.11*i,rely=.1,relwidth=.11)
-                        self.lists[i]=Listbox(self.frame,font=font1)
-                        self.lists[i].place(relx=0.005+0.11*i,rely=.15,relheight=.7,relwidth=.11)
+                        Label(self.frame,text=self.columns3[i],font=font1).place(relx=.005+0.11*i,rely=.01,relwidth=.11)
+                        self.lists[i]=Listbox(self.frame,font=font1,yscrollcommand=scrollbar.set)
+                        scrollbar.pack(side=RIGHT,fill=Y)
+                        self.lists[i].place(relx=0.005+0.11*i,rely=.1,relheight=.89,relwidth=.11)
+                        #scrollbar.config(command=self.lists[i].yview)
+                        
+                
+                
                 
                 #Button(self.frame,text="Go to Menu",width=20,command=lambda:controller.show_frame(MenuPage)).place(relx=.45,rely=.85)
+        def onvsb(self,*args):
+                for i in range(len(self.columns3)):
+                        self.lists[i].yview(*args)
+
         def search(self):
                 script=f"select * from customers where status='Open'"
 
@@ -449,7 +460,8 @@ class Accounts(Frame):
                 for i in range(len(self.columns3)):
                                 self.lists[i].delete(0,END)     
                 
-                for i in l:
+                for j in range(50):
+                        i=str(j)*9
                         self.lists[0].insert(END,str(i[0]))
                         self.lists[1].insert(END,str(i[1]))
                         self.lists[2].insert(END,str(i[2]))
