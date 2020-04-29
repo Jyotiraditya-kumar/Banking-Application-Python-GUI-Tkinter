@@ -8,6 +8,9 @@ font="arial 20 bold"
 font1="arial 15 bold"
 transd=[]
 import mysql.connector
+withdrawal_self=""
+new_self=""
+statement_self=""
 
 #con=mysql.connector.connect(user="root",password="08782",host="localhost",database="Banking",autocommit=True)
 con=sqlite3.connect("banking.db")
@@ -39,23 +42,19 @@ def transaction_id(dt):
                 con.commit()
                 return(dt+"0")
         
-def reset(cont,s):
+def reset(cont,page):
         mob.set("")
         cname.set("")
         acco.set("")
-        try:
-                s.fname.set("")
-                s.dob.set("")
-                s.email.set("")
-                s.txt.delete("1.0",END)
-                s.aadhar.set("")
-        except:
-                pass
-        try:
-                s.amount.set("")
-        except:
-                pass
-        cont.show_frame(MenuPage)
+        fname.set("")
+        dob.set("")
+        email.set("")
+        new_self.txt.delete("1.0",END)
+        aadhar.set("")
+        statement_self.from_date.set((datetime.date.today()-datetime.timedelta(30)).strftime("%Y/%m/%d"))
+        statement_self.to_date.set(datetime.date.today().strftime("%Y/%m/%d"))
+        cont.show_frame(page)
+
 
 class banking():
         def __init__(self,root):
@@ -68,7 +67,7 @@ class banking():
                 lab=Label(uf,text="JRT BANKING LTD",fg="red",font="arial 40 bold")
                 lab.place(relx=.35,rely=.05)
                 self.frames={}
-                for F in (LoginPage,MenuPage,New,Deposit,Withdraw,Statement):
+                for F in (MenuPage,LoginPage,New,Deposit,Withdraw,Statement,Close_Account,Balance_Check):
                         
                         frame=F(lf,self)
                         self.frames[F]=frame
@@ -85,6 +84,8 @@ class LoginPage(Frame):
                 self.frame.place(relx=.1,rely=0.1,relwidth=.8,relheight=.8)
                 self.user=StringVar()
                 self.pwd=StringVar()
+                self.user.set("Jrtyagi")
+                self.pwd.set("Jt123456@")
                 
                 self.Controller=controller
                 Label(self.frame,text="Username",fg="red",font=font).place(relx=.1,rely=.1)
@@ -115,26 +116,30 @@ class MenuPage(Frame):
                 Button(self.frame,width=20,text="Deposit",bg="skyblue",command=lambda:controller.show_frame(Deposit)).place(relx=.4,rely=.2)
                 Button(self.frame,width=20,text="Withdraw",bg="skyblue",command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=.3)
                 Button(self.frame,width=20,text="Statement",bg="skyblue",command=lambda:controller.show_frame(Statement)).place(relx=.4,rely=.4)
-                #Button(self.frame,width=20,text="New Account",bg="skyblue",command=lambda:controller.show_frame(New)).place(relx=.2,rely=.1)
+                Button(self.frame,width=20,text="Balance Check",bg="skyblue",command=lambda:controller.show_frame(Balance_Check)).place(relx=.4,rely=.5)
 
 class New(Frame):
         def __init__(self,parent,controller):
                 Frame.__init__(self,parent)
-                
+                w=18
                 self.container=Frame(self)
                 self.container.place(relwidth=1,relheight=1)
-                Button(self.container,text="Main Menu",width=20,font=font1,relief=GROOVE,command=lambda:reset(controller,self)).place(relx=0,rely=0)
-                Button(self.container,text="Deposit",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Deposit)).place(relx=.2,rely=0)
-                Button(self.container,text="Withdraw",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=0)
-                Button(self.container,text="Statement",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Statement)).place(relx=.6,rely=0)
+                Button(self.container,text="New Account",font=font1,relief=SUNKEN,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=GROOVE,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=GROOVE,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=GROOVE,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=GROOVE,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=GROOVE,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
                 self.frame=LabelFrame(self.container,text="New Account")
-                self.frame.place(relx=.1,rely=.1,relheight=.8,relwidth=.8)
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
                 self.c=controller
+                global new_self
+                new_self=self
                 
-                self.fname=StringVar()
-                self.dob=StringVar()
-                self.email=StringVar()
-                self.aadhar=StringVar()
+                # fname=StringVar()
+                # dob=StringVar()
+                # aadhar=StringVar()
+                # aadhar=StringVar()
 
                 
                 
@@ -142,35 +147,35 @@ class New(Frame):
                 Entry(self.frame,textvariable=cname,width=30,font=font1,border=10,insertwidth=4).place(relx=.2,rely=.02)
                 
                 Label(self.frame,text="Fathers's Name",fg="red",font=font1).place(relx=.55,rely=.02)
-                Entry(self.frame,textvariable=self.fname,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.02)
+                Entry(self.frame,textvariable=fname,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.02)
                 
                 Label(self.frame,text="Date Of Birth",fg="red",font=font1).place(relx=.02,rely=.2)
-                Entry(self.frame,textvariable=self.dob,width=30,font=font1,border=10,insertwidth=4).place(relx=.2,rely=.2)
+                Entry(self.frame,textvariable=dob,width=30,font=font1,border=10,insertwidth=4).place(relx=.2,rely=.2)
                 
                 Label(self.frame,text="Email",fg="red",font=font1).place(relx=.55,rely=.2)
-                Entry(self.frame,textvariable=self.email,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.2)
+                Entry(self.frame,textvariable=aadhar,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.2)
                 
                 Label(self.frame,text="Contact Number",fg="red",font=font1).place(relx=.02,rely=.4)
                 Entry(self.frame,textvariable=mob,width=30,font=font1,border=10,insertwidth=4).place(relx=.2,rely=.4)
                 
                 Label(self.frame,text="Aadhar Number",fg="red",font=font1).place(relx=.55,rely=.4)
-                Entry(self.frame,textvariable=self.aadhar,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.4)
+                Entry(self.frame,textvariable=aadhar,width=30,font=font1,border=10,insertwidth=4).place(relx=.7,rely=.4)
 
                 Label(self.frame,text="Permanent Address",fg="red",font=font1).place(relx=.02,rely=.6)
 
                 self.txt=Text(self.frame,font=font1)
                 self.txt.place(relx=.3,rely=.6,relwidth=.6,relheight=.2)
                 Button(self.frame,text="Submit",bg="skyblue",width=10,command=self.submit).place(relx=.6,rely=.82)
-                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,self)).place(relx=.7,rely=.82)
+                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.82)
 
         def submit(self):
                 #cur.execute(f"select * from customers where ")
-                #dt=datetime.strptime(self.dob.get(),%Y%m%d)
+                #dt=datetime.strptime(dob.get(),%Y%m%d)
                 try:
                         acc_no=acc()
-                        s=f"""insert into customers values('{acc_no}','{cname.get()}','{self.fname.get()}','{self.dob.get()}','{self.aadhar.get()}',
-                        '{self.email.get()}','{mob.get()}','{self.txt.get('1.0',END)}',0,'Open')"""
-                        #s=f"insert into customers values(account='{acc()}',name='{self.cname.get()}',f_name='{self.fname.get()}',dob='{self.dob.get()}',email='{self.email.get()}',mobile='{self.mob.get()}',address='{self.txt.get('1.0',END)}',aadhar='{self.aadhar.get()}')"
+                        s=f"""insert into customers values('{acc_no}','{cname.get()}','{fname.get()}','{dob.get()}','{aadhar.get()}',
+                        '{aadhar.get()}','{mob.get()}','{self.txt.get('1.0',END)}',0,'Open')"""
+                        #s=f"insert into customers values(account='{acc()}',name='{dob.get()}',f_name='{fname.get()}',dob='{dob.get()}',email='{aadhar.get()}',mobile='{aadhar.get()}',address='{self.txt.get('1.0',END)}',aadhar='{aadhar.get()}')"
                         cur.execute(s)
                         con.commit()
                         acco.set(str(acc_no))
@@ -190,14 +195,14 @@ class Deposit(Frame):
                 Frame.__init__(self,parent)
                 self.container=Frame(self)
                 self.container.place(relwidth=1,relheight=1)
-                Button(self.container,text="Main Menu",width=20,font=font1,relief=GROOVE,command=lambda:reset(controller,self)).place(relx=0,rely=0)
-                Button(self.container,text="Deposit",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Deposit)).place(relx=.2,rely=0)
-                Button(self.container,text="Withdraw",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=0)
-                Button(self.container,text="Statement",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Statement)).place(relx=.6,rely=0)
-                
+                Button(self.container,text="New Account",font=font1,relief=GROOVE,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=SUNKEN,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=GROOVE,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=GROOVE,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=GROOVE,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=GROOVE,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
                 self.frame=LabelFrame(self.container,text="Deposit")
-                self.frame.place(relx=.1,rely=.1,relheight=.8,relwidth=.8)
-                self.amount=DoubleVar()
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
                 Label(self.frame,text="Account Number",font=font,fg="red").place(relx=.1,rely=.1)
                 Entry(self.frame,textvariable=acco,width=30,font=font).place(relx=.4,rely=.1)
                 Label(self.frame,text="Customer Name",font=font,fg="red").place(relx=.1,rely=.3)
@@ -205,9 +210,9 @@ class Deposit(Frame):
                 Label(self.frame,text="Mobile Number",font=font,fg="red").place(relx=.1,rely=.5)
                 Entry(self.frame,textvariable=mob,width=30,font=font).place(relx=.4,rely=.5)
                 Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
-                Entry(self.frame,textvariable=self.amount,width=30,font=font).place(relx=.4,rely=.7)
+                Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
                 Button(self.frame,text="Deposit",bg="skyblue",width=20,command=self.deposit).place(relx=.6,rely=.8)
-                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,self)).place(relx=.7,rely=.8)
+                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
         def deposit(self):
                 dt=datetime.date.today().strftime("%Y/%m/%d")
                 t=datetime.datetime.now().strftime("%H:%M:%S")
@@ -216,33 +221,36 @@ class Deposit(Frame):
                 if l:
                         if l[1].upper()==cname.get().upper():
                                 tran_id=transaction_id(dt.replace("/",""))
-                                cur.execute(f"update customers set balance=balance+{float(self.amount.get())} where account={acco.get()}")
+                                cur.execute(f"update customers set balance=balance+{float(amount.get())} where account={acco.get()}")
                                 con.commit()
-                                cur.execute(f"insert into transactions values('{tran_id}','{acco.get()}','{self.amount.get()}','{dt}','{t}','Credit')")
+                                cur.execute(f"insert into transactions values('{tran_id}','{acco.get()}','{amount.get()}','{dt}','{t}','Credit')")
                                 con.commit()
                                 print(tran_id)
-                                messagebox.showinfo("info",f"Transcation Id :{tran_id}\n Deposited Amount :{self.amount.get()}\n Status : Success ")
+                                messagebox.showinfo("info",f"Transcation Id :{tran_id}\n Deposited Amount :{amount.get()}\n Status : Success ")
                         else:
                                 messagebox.showerror("error","wrong name")
                 else:
                         messagebox.showerror("error","wrong account number")
                 print(acco.get())
                 print(cname.get())
-                print(self.amount.get())
+                print(amount.get())
 
 class Withdraw(Frame):
         def __init__(self,parent,controller):
                 Frame.__init__(self,parent)
                 self.container=Frame(self)
                 self.container.place(relwidth=1,relheight=1)
-                Button(self.container,text="Main Menu",width=20,font=font1,relief=GROOVE,command=lambda:reset(controller,self)).place(relx=0,rely=0)
-                Button(self.container,text="Deposit",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Deposit)).place(relx=.2,rely=0)
-                Button(self.container,text="Withdraw",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=0)
-                Button(self.container,text="Statement",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Statement)).place(relx=.6,rely=0)
-                
+                Button(self.container,text="New Account",font=font1,relief=GROOVE,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=GROOVE,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=SUNKEN,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=GROOVE,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=GROOVE,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=GROOVE,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
                 self.frame=LabelFrame(self.container,text="Withdraw")
-                self.frame.place(relx=.1,rely=.1,relheight=.8,relwidth=.8)
-                self.amount=DoubleVar()
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
+                global withdrawal_self
+                withdrawal_self=self
+                #amount=DoubleVar()
                 Label(self.frame,text="Account Number",font=font,fg="red").place(relx=.1,rely=.1)
                 Entry(self.frame,textvariable=acco,width=30,font=font).place(relx=.4,rely=.1)
                 Label(self.frame,text="Customer Name",font=font,fg="red").place(relx=.1,rely=.3)
@@ -250,9 +258,9 @@ class Withdraw(Frame):
                 Label(self.frame,text="Mobile Number",font=font,fg="red").place(relx=.1,rely=.5)
                 Entry(self.frame,textvariable=mob,width=30,font=font).place(relx=.4,rely=.5)
                 Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
-                Entry(self.frame,textvariable=self.amount,width=30,font=font).place(relx=.4,rely=.7)
+                Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
                 Button(self.frame,text="Withdraw",bg="skyblue",width=20,command=self.withdraw).place(relx=.6,rely=.8)
-                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,self)).place(relx=.7,rely=.8)
+                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
 
         def withdraw(self):
                 dt=datetime.date.today().strftime("%Y/%m/%d")
@@ -262,14 +270,14 @@ class Withdraw(Frame):
                 l=cur.fetchone()
                 if l:
                         if l[1].upper()==cname.get().upper():
-                                if float(l[8])>=float(self.amount.get()):
+                                if float(l[8])>=float(amount.get()):
                                         tran_id=transaction_id(dt.replace("/",""))
-                                        cur.execute(f"update customers set balance=balance-{float(self.amount.get())} where account={acco.get()}")
+                                        cur.execute(f"update customers set balance=balance-{float(amount.get())} where account='{acco.get()}''")
                                         con.commit()
-                                        cur.execute(f"insert into transactions values('{tran_id}','{acco.get()}','{self.amount.get()}','{dt}','{t}','Debit')")
+                                        cur.execute(f"insert into transactions values('{tran_id}','{acco.get()}','{amount.get()}','{dt}','{t}','Debit')")
                                         con.commit()
                                         print(tran_id)
-                                        messagebox.showinfo("info",f"Transcation Id :{tran_id}\n Withdrawal Amount :{self.amount.get()}\n Status : Success ")
+                                        messagebox.showinfo("info",f"Transcation Id :{tran_id}\n Withdrawal Amount :{amount.get()}\n Status : Success ")
                                 else:
                                         messagebox.showerror("Error!","Not Enough Balance\n Avilable balance is "+str(l[8]))
 
@@ -279,23 +287,91 @@ class Withdraw(Frame):
                         messagebox.showerror("error","wrong account number")
                 print(acco.get())
                 print(cname.get())
-                print(self.amount.get())
+                print(amount.get())
+
+class Close_Account(Frame):
+        def __init__(self,parent,controller):
+                Frame.__init__(self,parent)
+                self.container=Frame(self)
+                self.container.place(relwidth=1,relheight=1)
+                Button(self.container,text="New Account",font=font1,relief=GROOVE,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=GROOVE,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=GROOVE,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=GROOVE,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=GROOVE,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=SUNKEN,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
+                self.frame=LabelFrame(self.container,text="Close Account")
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
+                
+                #amount=DoubleVar()
+                Label(self.frame,text="Account Number",font=font,fg="red").place(relx=.1,rely=.1)
+                Entry(self.frame,textvariable=acco,width=30,font=font).place(relx=.4,rely=.1)
+                Label(self.frame,text="Customer Name",font=font,fg="red").place(relx=.1,rely=.3)
+                Entry(self.frame,textvariable=cname,width=30,font=font).place(relx=.4,rely=.3)
+                Label(self.frame,text="Mobile Number",font=font,fg="red").place(relx=.1,rely=.5)
+                Entry(self.frame,textvariable=mob,width=30,font=font).place(relx=.4,rely=.5)
+                Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
+                Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
+                self.b1=Button(self.frame,text="Close Account",bg="skyblue",width=20,command=withdrawal_self.withdraw)
+                self.b1.place(relx=.6,rely=.8)
+                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
+
+class Balance_Check(Frame):
+        def __init__(self,parent,controller):
+                Frame.__init__(self,parent)
+                self.container=Frame(self)
+                self.container.place(relwidth=1,relheight=1)
+                Button(self.container,text="New Account",font=font1,relief=GROOVE,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=GROOVE,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=GROOVE,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=SUNKEN,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=GROOVE,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=GROOVE,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
+                self.frame=LabelFrame(self.container,text="Balance Check")
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
+                #amount=DoubleVar()
+                Label(self.frame,text="Account Number",font=font,fg="red").place(relx=.1,rely=.1)
+                Entry(self.frame,textvariable=acco,width=30,font=font).place(relx=.4,rely=.1)
+                Label(self.frame,text="Customer Name",font=font,fg="red").place(relx=.1,rely=.3)
+                Entry(self.frame,textvariable=cname,width=30,font=font).place(relx=.4,rely=.3)
+                Label(self.frame,text="Mobile Number",font=font,fg="red").place(relx=.1,rely=.5)
+                Entry(self.frame,textvariable=mob,width=30,font=font).place(relx=.4,rely=.5)
+                Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
+                self.e1=Entry(self.frame,textvariable=amount,width=30,font=font,state="disabled")
+                self.e1.place(relx=.4,rely=.7)
+                self.b1=Button(self.frame,text="Check Balance",bg="skyblue",width=20,command=self.show_balance)
+                self.b1.place(relx=.6,rely=.8)
+                Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
+        def show_balance(self):
+                script=f"select balance from customers where account='{acco.get()}'"
+                cur.execute(script)
+                print(script)
+                l=cur.fetchone()
+                print(l)
+                if l:
+                        amount.set(l[0])
+                else:
+                        messagebox.showerror("error","Wrong Account Number")
 
 class Statement(Frame):
         def __init__(self,parent,controller):
                 Frame.__init__(self,parent)
                 self.container=Frame(self)
                 self.container.place(relwidth=1,relheight=1)
-                Button(self.container,text="Main Menu",width=20,font=font1,relief=GROOVE,command=lambda:reset(controller,self)).place(relx=0,rely=0)
-                Button(self.container,text="Deposit",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Deposit)).place(relx=.2,rely=0)
-                Button(self.container,text="Withdraw",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=0)
-                Button(self.container,text="Statement",width=20,font=font1,relief=GROOVE,command=lambda:controller.show_frame(Statement)).place(relx=.6,rely=0)
-                
+                Button(self.container,text="New Account",font=font1,relief=GROOVE,command=lambda:reset(controller,New)).place(relx=0.05,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Deposit",font=font1,relief=GROOVE,command=lambda:reset(controller,Deposit)).place(relx=.19,rely=0.0,relwidth=0.9/6)
+                Button(self.container,text="Withdraw",font=font1,relief=GROOVE,command=lambda:reset(controller,Withdraw)).place(relx=.33,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Check Balance",font=font1,relief=GROOVE,command=lambda:reset(controller,Balance_Check)).place(relx=.47,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Statement",font=font1,relief=SUNKEN,command=lambda:reset(controller,Statement)).place(relx=.61,rely=0,relwidth=0.9/6)
+                Button(self.container,text="Close Account",font=font1,relief=GROOVE,command=lambda:reset(controller,Close_Account)).place(relx=.75,rely=0,relwidth=0.9/6)
                 self.frame=LabelFrame(self.container,text="Account Statement")
-                self.frame.place(relx=.01,rely=.1,relheight=.8,relwidth=1)
+                self.frame.place(relx=.05,rely=.1,relheight=.8,relwidth=.9)
+
                 self.from_date=StringVar()
                 self.to_date=StringVar()
                 self.type=StringVar()
+                global statement_self
+                statement_self=self
                 self.lists=[""]*5
                 self.type.set("All")
                 self.from_date.set((datetime.date.today()-datetime.timedelta(30)).strftime("%Y/%m/%d"))
@@ -353,6 +429,11 @@ root=Tk()
 cname=StringVar()
 mob=StringVar()
 acco=StringVar()
+amount=DoubleVar()
+fname=StringVar()
+dob=StringVar()
+email=StringVar()
+aadhar=StringVar()
 root.title("JRT BANKING LTD")
 root.geometry("1920x1080")
 a=banking(root)
