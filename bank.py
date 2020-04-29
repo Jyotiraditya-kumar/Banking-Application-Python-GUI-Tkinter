@@ -111,18 +111,6 @@ class LoginPage(Frame):
                 else:
                         messagebox.showerror("Error","Authentication failed")
 
-class MenuPage(Frame):
-        def __init__(self,parent,controller):
-                Frame.__init__(self,parent)
-                self.frame=LabelFrame(self,text="Our Services")
-                self.frame.place(relx=.1,rely=.1,relheight=.8,relwidth=.8)
-                Button(self.frame,width=20,text="New Account",bg="skyblue",command=lambda:controller.show_frame(New)).place(relx=.4,rely=.1)
-                Button(self.frame,width=20,text="Deposit",bg="skyblue",command=lambda:controller.show_frame(Deposit)).place(relx=.4,rely=.2)
-                Button(self.frame,width=20,text="Withdraw",bg="skyblue",command=lambda:controller.show_frame(Withdraw)).place(relx=.4,rely=.3)
-                Button(self.frame,width=20,text="Statement",bg="skyblue",command=lambda:controller.show_frame(Statement)).place(relx=.4,rely=.4)
-                Button(self.frame,width=20,text="Balance Check",bg="skyblue",command=lambda:controller.show_frame(Balance_Check)).place(relx=.4,rely=.5)
-                Button(self.frame,width=20,text="Accounts",bg="skyblue",command=lambda:controller.show_frame(Accounts)).place(relx=.4,rely=.6)
-
 class New(Frame):
         def __init__(self,parent,controller):
                 Frame.__init__(self,parent)
@@ -164,7 +152,6 @@ class New(Frame):
                 self.txt=Text(self.frame,font=font1)
                 self.txt.place(relx=.3,rely=.6,relwidth=.6,relheight=.2)
                 Button(self.frame,text="Submit",bg="skyblue",width=10,command=self.submit).place(relx=.6,rely=.82)
-                #Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.82)
 
         def submit(self):
                 
@@ -207,7 +194,6 @@ class Deposit(Frame):
                 Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
                 Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
                 Button(self.frame,text="Deposit",bg="skyblue",width=20,command=self.deposit).place(relx=.6,rely=.8)
-                #Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
         def deposit(self):
                 dt=datetime.date.today().strftime("%Y/%m/%d")
                 t=datetime.datetime.now().strftime("%H:%M:%S")
@@ -253,7 +239,6 @@ class Withdraw(Frame):
                 Label(self.frame,text="Amount",font=font,fg="red").place(relx=.1,rely=.7)
                 Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
                 Button(self.frame,text="Withdraw",bg="skyblue",width=20,command=self.withdraw).place(relx=.6,rely=.8)
-                #Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
 
         def withdraw(self):
                 dt=datetime.date.today().strftime("%Y/%m/%d")
@@ -305,7 +290,6 @@ class Close_Account(Frame):
                 Entry(self.frame,textvariable=amount,width=30,font=font).place(relx=.4,rely=.7)
                 self.b1=Button(self.frame,text="Close Account",bg="skyblue",width=20,command=withdrawal_self.withdraw)
                 self.b1.place(relx=.6,rely=.8)
-                #Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
 
 class Balance_Check(Frame):
         def __init__(self,parent,controller):
@@ -333,7 +317,6 @@ class Balance_Check(Frame):
                 self.e1.place(relx=.4,rely=.7)
                 self.b1=Button(self.frame,text="Check Balance",bg="skyblue",width=20,command=self.show_balance)
                 self.b1.place(relx=.6,rely=.8)
-                #Button(self.frame,text="Main Menu",bg="skyblue",width=20,command=lambda:reset(controller,MenuPage)).place(relx=.7,rely=.8)
         def show_balance(self):
                 script=f"select balance from customers where account='{acco.get()}'"
                 cur.execute(script)
@@ -384,11 +367,8 @@ class Statement(Frame):
                         Label(self.frame,text=columns2[i],font=font1).place(relx=.005+.194*i,rely=.2,relwidth=.19)
                         self.lists[i]=Listbox(self.frame,font=font1)
                         self.lists[i].place(relx=0.005+.194*i,rely=.25,relheight=.5,relwidth=.19)
-                self.label=Label(self.frame,text="TRANSACTIONS")
-                #self.label.place(relx=0,rely=.2,relheight=.7,relwidth=1)
                 Button(self.frame,text="Search",width=20,command=self.search).place(relx=.9,rely=0)
-                #Button(self.frame,text="Go to Menu",width=20,command=lambda:controller.show_frame(MenuPage)).place(relx=.45,rely=.85)
-                #Button(self.frame,text="Log Out",width=20,command=lambda:controller.show_frame(LoginPage)).place(relx=.65,rely=.85)
+                
         def search(self):
                 if self.type.get()=="All":
                         script=f"select * from transactions where account='{acco.get()}' and date between '{self.from_date.get()}' and '{self.to_date.get()}'"
@@ -442,12 +422,7 @@ class Accounts(Frame):
                         self.lists[i]=Listbox(self.frame,font=font1,yscrollcommand=scrollbar.set)
                         scrollbar.pack(side=RIGHT,fill=Y)
                         self.lists[i].place(relx=0.005+0.11*i,rely=.1,relheight=.89,relwidth=.11)
-                        #scrollbar.config(command=self.lists[i].yview)
-                        
-                
-                
-                
-                #Button(self.frame,text="Go to Menu",width=20,command=lambda:controller.show_frame(MenuPage)).place(relx=.45,rely=.85)
+
         def onvsb(self,*args):
                 for i in range(len(self.columns3)):
                         self.lists[i].yview(*args)
@@ -460,8 +435,8 @@ class Accounts(Frame):
                 for i in range(len(self.columns3)):
                                 self.lists[i].delete(0,END)     
                 
-                for j in range(50):
-                        i=str(j)*9
+                for i in l:
+                        
                         self.lists[0].insert(END,str(i[0]))
                         self.lists[1].insert(END,str(i[1]))
                         self.lists[2].insert(END,str(i[2]))
@@ -471,13 +446,6 @@ class Accounts(Frame):
                         self.lists[6].insert(END,str(i[6]))
                         self.lists[7].insert(END,str(i[7]))
                         self.lists[8].insert(END,i[8])
-        def reset(self):
-                acco.set("")
-                self.type.set("All")
-                self.from_date.set("")
-                self.to_date.set("")
-                for i in range(len(columns2)):
-                        self.lists[i].delete(0,END)
                 
 
 root=Tk()
