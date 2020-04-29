@@ -436,9 +436,9 @@ class Accounts(Frame):
                 account_self=self
                 self.lists=[""]*9
                 for i in range(len(self.columns3)):
-                        Label(self.frame,text=self.columns3[i],font=font1).place(relx=.005+0.11*i,rely=.2,relwidth=.11)
+                        Label(self.frame,text=self.columns3[i],font=font1).place(relx=.005+0.11*i,rely=.1,relwidth=.11)
                         self.lists[i]=Listbox(self.frame,font=font1)
-                        self.lists[i].place(relx=0.005+0.11*i,rely=.25,relheight=.7,relwidth=.11)
+                        self.lists[i].place(relx=0.005+0.11*i,rely=.15,relheight=.7,relwidth=.11)
                 
                 #Button(self.frame,text="Go to Menu",width=20,command=lambda:controller.show_frame(MenuPage)).place(relx=.45,rely=.85)
         def search(self):
